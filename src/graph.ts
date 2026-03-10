@@ -2,7 +2,7 @@ import "dotenv/config";
 import { ChatAnthropic } from "@langchain/anthropic";
 import { Annotation, StateGraph, START, END } from "@langchain/langgraph";
 import { BaseMessage, HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { searchAllMallData, searchAllPropertyData, type SearchResult } from "./tools.js";
+import { searchAllMallData, searchAllPropertyData } from "./tools.js";
 
 export const AgentState = Annotation.Root({
   messages: Annotation<BaseMessage[]>({
@@ -64,28 +64,30 @@ Important:
       new HumanMessage(state.query),
     ]);
 
-    const raw = (response.content as string).trim().toLowerCase();
-    const intent = (
-      ["shopper_assistant", "property_inquiry"].includes(raw) ? raw : "unknown"
-    ) as AgentStateType["intent"];
+    const raw = String(response.content).trim().toLowerCase();
+    const validIntents = ["shopper_assistant", "property_inquiry"];
+    const intent: AgentStateType["intent"] = validIntents.includes(raw)
+      ? (raw as "shopper_assistant" | "property_inquiry")
+      : "unknown";
 
     return { intent };
   } catch (error) {
     console.error("[classify_intent] LLM call failed, defaulting to unknown:", error);
-    return { intent: "unknown" as AgentStateType["intent"] };
+    const intent: AgentStateType["intent"] = "unknown";
+    return { intent };
   }
 }
 
 function retrieveMall(state: AgentStateType) {
-  const results: SearchResult[] = searchAllMallData(state.query);
-  const context = results.map((r) => r.data as Record<string, unknown>);
+  const results = searchAllMallData(state.query);
+  const context: Record<string, unknown>[] = results.map((r) => ({ ...r.data }));
   const sources = [...new Set(results.map((r) => r.source))];
   return { context, sources };
 }
 
 function retrieveProperty(state: AgentStateType) {
-  const results: SearchResult[] = searchAllPropertyData(state.query);
-  const context = results.map((r) => r.data as Record<string, unknown>);
+  const results = searchAllPropertyData(state.query);
+  const context: Record<string, unknown>[] = results.map((r) => ({ ...r.data }));
   const sources = [...new Set(results.map((r) => r.source))];
   return { context, sources };
 }
@@ -133,7 +135,7 @@ STRICT RULES:
       ),
     ]);
 
-    const answer = response.content as string;
+    const answer = String(response.content);
     return { answer, messages: [response] };
   } catch (error) {
     console.error("[generate_answer] LLM call failed:", error);
