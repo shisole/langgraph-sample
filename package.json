@@ -1,0 +1,28 @@
+{
+  "name": "langgraph-sample",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsx src/app.ts",
+    "eval": "tsx src/eval.ts",
+    "lesson:1": "tsx learn/01-chat-models.ts",
+    "lesson:2": "tsx learn/02-tools.ts",
+    "lesson:3": "tsx learn/03-tool-loop.ts",
+    "lesson:4": "tsx learn/04-langgraph-basics.ts",
+    "lesson:5": "tsx learn/05-custom-state.ts",
+    "lesson:6": "tsx learn/06-conditional-routing.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@langchain/anthropic": "^1.3.22",
+    "@langchain/core": "^1.1.31",
+    "@langchain/langgraph": "^1.2.1",
+    "dotenv": "^17.3.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "zod": "^4.3.6"
+  }
+}

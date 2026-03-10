@@ -1,0 +1,5 @@
+node_modules
+learn
+.claude
+.env
+.env.local
