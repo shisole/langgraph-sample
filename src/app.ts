@@ -4,6 +4,7 @@ import { AIMessage, BaseMessage, HumanMessage } from "@langchain/core/messages";
 import { graph } from "./graph.js";
 
 const DEBUG = process.env.DEBUG === "true";
+const VERBOSE = process.env.VERBOSE === "true";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -52,7 +53,7 @@ async function main() {
       console.log("─".repeat(50));
       console.log(result.answer);
 
-      if (result.sources.length > 0) {
+      if (VERBOSE && result.sources.length > 0) {
         console.log("─".repeat(50));
         console.log("Sources:", result.sources.join(", "));
       }
