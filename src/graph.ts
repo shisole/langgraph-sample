@@ -160,12 +160,15 @@ function routeByIntent(state: AgentStateType) {
 }
 
 const workflow = new StateGraph(AgentState)
+  // Classification and retrieval nodes
   .addNode("extract_query", extractQuery)
   .addNode("classify_intent", classifyIntent)
   .addNode("retrieve_mall", retrieveMall)
   .addNode("retrieve_property", retrieveProperty)
   .addNode("handle_unknown", handleUnknown)
   .addNode("generate_answer", generateAnswer)
+
+  // Where it starts
   .addEdge(START, "extract_query")
   .addEdge("extract_query", "classify_intent")
   .addConditionalEdges("classify_intent", routeByIntent, {
