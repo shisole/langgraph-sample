@@ -99,6 +99,16 @@ function mockClassifyIntent(state: AgentStateType): { intent: AgentStateType["in
 
 // ── Mock answer generator (template-based) ──────────────────────────
 function mockGenerateAnswer(state: AgentStateType): { answer: string } {
+  if (state.context.length === 0) {
+    return {
+      answer:
+        `I searched our ${state.intent === "shopper_assistant" ? "mall" : "property"} records ` +
+        `for "${state.query}" but could not find matching data. ` +
+        "Please try rephrasing your question or contact Meridian Properties directly for assistance." +
+        "\n\n*(mock mode — no LLM was used to generate this answer)*",
+    };
+  }
+
   const lines: string[] = [];
   lines.push(`Here's what I found for your query: "${state.query}"\n`);
 
@@ -242,6 +252,31 @@ async function generateAnswer(state: AgentStateType) {
   return llmGenerateAnswer(state);
 }
 
+// ── Quality check (LangGraph-native reliability gate) ────────────────
+function qualityCheck(state: AgentStateType): Partial<AgentStateType> {
+  // Guard: if retrieval found nothing, replace answer with an honest message
+  if (state.context.length === 0 && state.intent !== "unknown") {
+    const domain = state.intent === "shopper_assistant" ? "mall" : "property";
+    return {
+      answer:
+        `I searched our ${domain} records for "${state.query}" but could not find sufficient evidence to answer. ` +
+        "Please try rephrasing your question or contact Meridian Properties directly for assistance.",
+    };
+  }
+
+  // Guard: ensure source citations appear in the answer
+  if (state.sources.length > 0) {
+    const hasCitation = state.sources.some((s) => state.answer.includes(`[${s}]`));
+    if (!hasCitation) {
+      const citations = state.sources.map((s) => `[${s}]`).join(" ");
+      return { answer: `${state.answer}\n\nSources: ${citations}` };
+    }
+  }
+
+  // Pass through — answer is fine as-is
+  return {};
+}
+
 function routeByIntent(state: AgentStateType) {
   switch (state.intent) {
     case "shopper_assistant":
@@ -261,6 +296,7 @@ const workflow = new StateGraph(AgentState)
   .addNode("retrieve_property", retrieveProperty)
   .addNode("handle_unknown", handleUnknown)
   .addNode("generate_answer", generateAnswer)
+  .addNode("quality_check", qualityCheck)
 
   // Where it starts
   .addEdge(START, "extract_query")
@@ -272,7 +308,8 @@ const workflow = new StateGraph(AgentState)
   })
   .addEdge("retrieve_mall", "generate_answer")
   .addEdge("retrieve_property", "generate_answer")
-  .addEdge("generate_answer", END)
+  .addEdge("generate_answer", "quality_check")
+  .addEdge("quality_check", END)
   .addEdge("handle_unknown", END);
 
 export const graph = workflow.compile();

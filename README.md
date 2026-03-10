@@ -21,15 +21,17 @@ pnpm eval
 
 ## Graph Design
 
-The chatbot uses a 6-node LangGraph workflow with conditional routing based on intent classification:
+The chatbot uses a 7-node LangGraph workflow with conditional routing based on intent classification:
 
 ```
 START → [extract_query] → [classify_intent] → ROUTE
-                                                 ├─ shopper_assistant → [retrieve_mall]
-                                                 ├─ property_inquiry  → [retrieve_property]
-                                                 └─ unknown           → [handle_unknown]
-                                                                            ↓
-                                                               [generate_answer] → END
+                                                 ├─ shopper_assistant → [retrieve_mall]  ──┐
+                                                 ├─ property_inquiry  → [retrieve_property]┤
+                                                 │                                         ↓
+                                                 │                            [generate_answer]
+                                                 │                                         ↓
+                                                 │                             [quality_check] → END
+                                                 └─ unknown → [handle_unknown] ──────────────→ END
 ```
 
 ### Nodes
@@ -42,6 +44,7 @@ START → [extract_query] → [classify_intent] → ROUTE
 | `retrieve_property` | Searches property CSV/TXT data files for listings and amenity details |
 | `handle_unknown` | Returns a polite out-of-scope message with guidance on what the bot can help with |
 | `generate_answer` | LLM produces a grounded, cited response based only on retrieved context |
+| `quality_check` | Validates the answer: replaces empty-context answers with an honest "not found" message, and appends source citations if missing |
 
 ### State
 
@@ -58,7 +61,7 @@ START → [extract_query] → [classify_intent] → ROUTE
 
 ### Conditional Routing
 
-After `classify_intent`, `addConditionalEdges` routes to the appropriate retrieval node. The `unknown` path bypasses the LLM answer generation and returns a pre-defined guardrail response.
+After `classify_intent`, `addConditionalEdges` routes to the appropriate retrieval node. The `unknown` path bypasses answer generation entirely and returns a pre-defined guardrail response. For recognized intents, the `quality_check` node runs after `generate_answer` as a LangGraph-native reliability gate — it replaces empty-context answers with an honest "not found" message and ensures source citations are present.
 
 ### Evidence Grounding
 
