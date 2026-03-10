@@ -1,0 +1,17 @@
+mall_name,store_name,product_name,category,price_php,in_stock,description
+Solana Mall,Uniqlo,AIRism Cotton Crew Neck T-Shirt,Fashion & Apparel,590,true,Lightweight breathable cotton blend t-shirt with AIRism technology for comfort in tropical weather
+Solana Mall,Uniqlo,Ultra Light Down Vest,Fashion & Apparel,2490,true,Compact packable down vest ideal for air-conditioned offices and travel
+Solana Mall,Samsung Experience Store,Galaxy S26 Ultra,Electronics,79990,true,Latest flagship smartphone with AI-powered camera system 200MP sensor and S Pen
+Solana Mall,Samsung Experience Store,Galaxy Tab S10,Electronics,44990,true,Premium tablet with 12.4-inch AMOLED display ideal for productivity and entertainment
+Solana Mall,Power Mac Center,iPhone 17 Pro Max,Electronics,89990,true,Latest Apple flagship with A19 Pro chip advanced camera system and titanium design
+Solana Mall,Power Mac Center,MacBook Air M4,Electronics,74990,true,Ultra-thin laptop with Apple M4 chip 18-hour battery life and Liquid Retina display
+Solana Mall,Fully Booked,Classic Literature Illustrated Edition,Books & Stationery,895,true,Beautifully illustrated collector edition of classic literary works
+Solana Mall,Watsons,Skin Aqua UV Super Moisture Gel SPF50,Health & Beauty,549,true,Japanese sunscreen with lightweight gel formula for tropical climate protection
+Parkview Shopping Center,The Shoemaker,Classic Oxford Leather Shoes,Fashion & Apparel,3490,true,Handcrafted genuine leather oxford shoes made by local artisans
+Parkview Shopping Center,The Shoemaker,Casual Loafer,Fashion & Apparel,2890,true,Comfortable slip-on loafer in premium leather with cushioned insole
+Parkview Shopping Center,Fresh Market,Wagyu Beef Striploin A5,Grocery,8500,false,Japanese A5 grade wagyu beef per kilogram. Limited availability check store for restock dates
+Mercado Village,Petland,Premium Dog Food 15kg Bag,Pets,2890,true,Holistic grain-free dog food with real chicken and sweet potato for adult dogs
+Mercado Village,Art Circle Gallery,Abstract Oil Painting Original,Arts & Crafts,45000,true,Original 24x36 inch abstract oil painting by featured contemporary artist
+Mercado Village,Gourmet Market,Artisan Chocolate Gift Box,Food & Beverage,650,true,Gift box of 12 artisanal chocolate truffles from single-origin cacao beans
+The Atrium,Wildflour Cafe,Sourdough Loaf,Food & Beverage,320,true,Freshly baked artisanal sourdough bread made with 72-hour fermented dough
+The Atrium,Sunnies Studios,Classic Aviator Sunglasses,Fashion & Apparel,1299,true,UV400 protection aviator sunglasses with premium metal frame and polarized lenses

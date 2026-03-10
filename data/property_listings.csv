@@ -1,0 +1,16 @@
+development,tower,unit_type,bedrooms,floor_area_sqm,price_range_php,floor_level,facing,status,features
+Central Park Towers,Azure Tower,Studio,0,28.5,5800000-6200000,12,City View,Available,Fully fitted kitchen smart home ready balcony access to amenity deck
+Central Park Towers,Azure Tower,1BR,1,45.0,8500000-9500000,18,Garden View,Available,Separate bedroom fitted kitchen smart home ready balcony
+Central Park Towers,Azure Tower,2BR,2,72.0,14000000-16000000,25,Skyline View,Available,Two bedrooms with ensuite bath fitted kitchen maids quarter balcony
+Central Park Towers,Jade Tower,1BR,1,40.0,7800000-8800000,10,Pool View,Available,Compact one bedroom with balcony access to co-working lounge
+Central Park Towers,Jade Tower,2BR,2,65.0,12500000-14500000,20,City View,Reserved,Two bedrooms fitted kitchen utility area smart home enabled
+The Pinnacle,Tower 1,2BR,2,85.0,22000000-25000000,30,City Skyline,Available,Luxury two bedroom with premium finishes wine cellar access private lobby
+The Pinnacle,Tower 1,3BR,3,120.0,35000000-40000000,35,Bay Sunset View,Available,Three bedrooms with walk-in closets library nook service entrance private elevator lobby
+The Pinnacle,Tower 2,1BR,1,55.0,14000000-16000000,22,Garden View,Available,Premium one bedroom with European kitchen fixtures floor-to-ceiling windows
+Verde Gardens,Serene Residences,Studio,0,24.0,3200000-3600000,8,Garden View,Available,Cozy studio with open layout near retail and transport hub
+Verde Gardens,Serene Residences,1BR,1,36.0,5000000-5800000,15,Park View,Available,One bedroom overlooking verdant gardens and jogging paths
+Verde Gardens,Serene Residences,2BR,2,58.0,8200000-9500000,20,City View,Reserved,Two bedrooms with balcony near schools and commercial areas
+Willow Grove,Willow Park,3BR Townhouse,3,95.0,12000000-14000000,NA,Street View,Available,Three-storey townhouse with carport small garden and rooftop deck
+Willow Grove,Willow Park,2BR Condo,2,50.0,6500000-7500000,6,Courtyard View,Available,Mid-rise condo unit with resort-style amenities near commercial center
+Skyline Residences,Tower A,1BR,1,42.0,9000000-10500000,16,River View,Pre-selling,Premium one bedroom in upcoming mixed-use development with retail podium
+Skyline Residences,Tower A,2BR,2,68.0,15000000-17500000,28,CBD View,Pre-selling,Two bedrooms with smart home features infinity pool access sky lounge
