@@ -1,5 +1,4 @@
 import "dotenv/config";
-import { ChatAnthropic } from "@langchain/anthropic";
 import { Annotation, StateGraph, START, END } from "@langchain/langgraph";
 import { BaseMessage, HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { searchAllMallData, searchAllPropertyData } from "./tools.js";
@@ -33,10 +32,20 @@ export const AgentState = Annotation.Root({
 
 export type AgentStateType = typeof AgentState.State;
 
-const llm = new ChatAnthropic({
-  model: "claude-haiku-4-5-20251001",
-  temperature: 0,
-});
+// ── LLM setup (conditional on API key) ──────────────────────────────
+const USE_MOCK = !process.env.ANTHROPIC_API_KEY;
+
+if (USE_MOCK) {
+  console.log("[mock-mode] No ANTHROPIC_API_KEY found — running with deterministic mock LLM");
+}
+
+async function createLlm() {
+  const { ChatAnthropic } = await import("@langchain/anthropic");
+  return new ChatAnthropic({
+    model: "claude-haiku-4-5-20251001",
+    temperature: 0,
+  });
+}
 
 function extractQuery(state: AgentStateType) {
   const lastMessage = state.messages[state.messages.length - 1];
@@ -44,8 +53,77 @@ function extractQuery(state: AgentStateType) {
   return { query };
 }
 
-async function classifyIntent(state: AgentStateType) {
+// ── Mock intent classifier (keyword-based) ──────────────────────────
+const MALL_KEYWORDS = [
+  "mall", "store", "shop", "event", "food", "dining", "parking",
+  "hours", "product", "restaurant", "coffee", "shoe", "korean",
+];
+const PROPERTY_KEYWORDS = [
+  "property", "properties", "condo", "condos", "unit", "bedroom",
+  "amenity", "amenities", "price", "development", "tower", "studio",
+  "residential", "sqm",
+];
+const MALL_NAMES = [
+  "solana mall", "parkview shopping center", "mercado village", "the atrium",
+];
+const PROPERTY_NAMES = [
+  "central park towers", "the pinnacle", "verde gardens",
+  "willow grove", "skyline residences",
+];
+
+function mockClassifyIntent(state: AgentStateType): { intent: AgentStateType["intent"] } {
+  const q = state.query.toLowerCase();
+
+  // Cross-intent: mall name mentioned but asking about property topics
+  const mentionsMall = MALL_NAMES.some((name) => q.includes(name));
+  const mentionsProperty = PROPERTY_NAMES.some((name) => q.includes(name));
+  const hasPropertyKeyword = PROPERTY_KEYWORDS.some((kw) => q.includes(kw));
+  const hasMallKeyword = MALL_KEYWORDS.some((kw) => q.includes(kw));
+
+  if (mentionsMall && hasPropertyKeyword) {
+    return { intent: "property_inquiry" };
+  }
+  if (mentionsProperty && hasMallKeyword) {
+    return { intent: "shopper_assistant" };
+  }
+
+  if (hasPropertyKeyword || mentionsProperty) {
+    return { intent: "property_inquiry" };
+  }
+  if (hasMallKeyword || mentionsMall) {
+    return { intent: "shopper_assistant" };
+  }
+
+  return { intent: "unknown" };
+}
+
+// ── Mock answer generator (template-based) ──────────────────────────
+function mockGenerateAnswer(state: AgentStateType): { answer: string } {
+  const lines: string[] = [];
+  lines.push(`Here's what I found for your query: "${state.query}"\n`);
+
+  for (const record of state.context) {
+    const entries = Object.entries(record)
+      .map(([key, value]) => `  - **${key}**: ${String(value)}`)
+      .join("\n");
+    lines.push(entries);
+    lines.push("");
+  }
+
+  if (state.sources.length > 0) {
+    const citations = state.sources.map((s) => `[${s}]`).join(" ");
+    lines.push(`Sources: ${citations}`);
+  }
+
+  lines.push("\n*(mock mode — no LLM was used to generate this answer)*");
+
+  return { answer: lines.join("\n") };
+}
+
+// ── Real LLM intent classifier ──────────────────────────────────────
+async function llmClassifyIntent(state: AgentStateType) {
   try {
+    const llm = await createLlm();
     const response = await llm.invoke([
       new SystemMessage(
         `You are an intent classifier for Meridian Properties Corp. customer service chatbot.
@@ -78,6 +156,14 @@ Important:
   }
 }
 
+// ── Dispatchers (pick mock or real based on API key) ────────────────
+async function classifyIntent(state: AgentStateType) {
+  if (USE_MOCK) {
+    return mockClassifyIntent(state);
+  }
+  return llmClassifyIntent(state);
+}
+
 function retrieveMall(state: AgentStateType) {
   const results = searchAllMallData(state.query);
   const context: Record<string, unknown>[] = results.map((r) => ({ ...r.data }));
@@ -107,8 +193,9 @@ function handleUnknown(_state: AgentStateType) {
   };
 }
 
-async function generateAnswer(state: AgentStateType) {
+async function llmGenerateAnswer(state: AgentStateType) {
   try {
+    const llm = await createLlm();
     const contextStr = JSON.stringify(state.context, null, 2);
     const sourcesStr = state.sources.join(", ");
 
@@ -146,6 +233,13 @@ STRICT RULES:
         "Meridian Properties directly for assistance.",
     };
   }
+}
+
+async function generateAnswer(state: AgentStateType) {
+  if (USE_MOCK) {
+    return mockGenerateAnswer(state);
+  }
+  return llmGenerateAnswer(state);
 }
 
 function routeByIntent(state: AgentStateType) {
