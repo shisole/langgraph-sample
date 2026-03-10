@@ -1,5 +1,9 @@
 node_modules
-learn
-.claude
+dist
+
 .env
 .env.local
+
+.claude
+.DS_Store
+*.log
