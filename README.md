@@ -102,8 +102,21 @@ The chatbot uses 6 search functions as tools:
 
 All searches use case-insensitive keyword matching with stopword filtering.
 
+## Mock Mode (No API Key Required)
+
+When `ANTHROPIC_API_KEY` is not set, the chatbot automatically switches to **mock mode** with deterministic, keyword-based classification and template-based answer generation. The graph structure, state, conditional routing, and tool-based retrieval remain identical — only the two LLM-dependent nodes (`classify_intent` and `generate_answer`) are swapped out.
+
+```bash
+# Run without an API key — mock mode activates automatically
+unset ANTHROPIC_API_KEY
+pnpm start
+pnpm eval    # all 10 tests still pass
+```
+
+This lets reviewers test the graph structure, routing logic, state flow, and tool integration without needing credentials.
+
 ## Requirements
 
 - Node.js 18+
 - pnpm
-- Anthropic API key (uses Claude Haiku 4.5)
+- Anthropic API key — **optional** (uses Claude Haiku 4.5 when set; falls back to mock mode when absent)
