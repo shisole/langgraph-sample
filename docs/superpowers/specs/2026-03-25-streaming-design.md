@@ -84,8 +84,10 @@ if (VERBOSE && finalState && finalState.sources.length > 0) {
 
 console.log();
 
-// Push answer to conversation history
-conversationHistory.push(new AIMessage(answer));
+// Only push a non-empty answer to avoid corrupting conversation history
+if (answer) {
+  conversationHistory.push(new AIMessage(answer));
+}
 ```
 
 ## Chunk type disambiguation
